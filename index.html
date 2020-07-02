@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Visualising Goa</title>
+	<link href="https://fonts.googleapis.com/css?family=Nunito:200&display=swap" rel="stylesheet">
+		<link href="./css/bootstrap.min.css" rel="stylesheet">
+	<link href="./css/style.css" rel="stylesheet">
+	</head>
+	<body>
+		<div class="navbar navbar-dark bg-dark">
+			<div class="container-fluid ">
+				<a href="#" class="navbar-brand text-large">Visualising Goa</a>
+			</div>
+		</div>
+		<div class="container-fluid">
+			<div class="outermost-container">
+			</div>
+		</div>
+		<div id="settings-icon" class="m-1">
+			<button class="btn" type="button" data-toggle="modal" data-target="#settingsModal">
+				<img src="./images/settings_icon.png" alt="Settings" height="40px">
+			</button>
+		</div>
+		<div class="modal fade" id="settingsModal">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Settings</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-4">
+								<label for="numOfMaps">Number of Maps : </label>
+							</div>
+							<div class="col-8">
+								<div class="form-check form-check-inline">
+									<label>
+										<input type="radio" name="numMaps" value="1" checked="checked" id="num1"> 1
+									</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<label>
+										<input type="radio" name="numMaps" id="num2" value="2"> 2
+									</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<label>
+										<input type="radio" name="numMaps" id="num4" value="4"> 4
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-success" id="settingsButton">Apply</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+
+	<script src="./js/modules/d3-min.js"></script>
+	<script src="./js/modules/d3-geo.min.js"></script>
+	<script src="./js/modules/d3-scale.min.js"></script>
+	<script src="./js/modules/d3-geo-projection.min.js"></script>
+	<script src="js/modules/jquery-3.5.1.slim.min.js"></script>
+	<script src="js/modules/popper.min.js"></script>
+	<script src="js/modules/bootstrap.min.js"></script>
+	<script src="./js/vars.js"></script>
+	<script src="./js/main.js"></script>
+</html>
