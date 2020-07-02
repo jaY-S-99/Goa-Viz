@@ -288,5 +288,8 @@ $('#settingsButton').click(()=>{
 		create_a_map(1, 3, 3, 5, 2);
 		create_a_map(3, 5, 1, 3, 3);
 		create_a_map(3, 5, 3, 5, 4);
-	} 
+	}
 });
+
+clearMaps();
+create_a_map(1,5,1,5,1);
