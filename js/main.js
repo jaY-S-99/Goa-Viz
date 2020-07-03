@@ -229,7 +229,10 @@ function render_property(map_number,csv){
 		let statistics = [d3.mean(propertyVals),d3.median(propertyVals),d3.quantile(propertyVals,0.25),d3.quantile(propertyVals,0.75),d3.deviation(propertyVals),d3.min(propertyVals),d3.max(propertyVals)];
 		let range = [statistics[5],statistics[2],statistics[1],statistics[3],(statistics[3]-statistics[2])*1.5+statistics[1],(statistics[3]-statistics[2])*3+statistics[1],(statistics[3]-statistics[2])*4.5+statistics[1],(statistics[3]-statistics[2])*6+statistics[1]];
 		range = [...new Set(range)];
-		range = range.filter((d) => {if(!isNaN(d) && d!== 0){return d;}});
+		range = range.filter((d) => {if(!isNaN(d) && d!== 0){return d}});
+		if(range[range.length-1]>100){
+			range = range.map((d) => { return Math.ceil(d / 10) * 10; })
+		}
 		console.log(range);
 		let colour = d3.scaleThreshold()
 						.domain(range)
