@@ -23,7 +23,13 @@ function create_a_map(start_row,end_row,start_column,end_column,map_number){
 	let div_legend = div_map_space.append('div')
 																	.attr('class','legend-area')
 																	.attr('map_number',map_number)
-																	.style('grid-row-start','3')
+																	.style('grid-row-start', () => {
+																		let selected = $("input[type='radio'][name='numMaps']:checked");
+																		if (selected.length > 0) {
+																			numMaps = selected.val();
+																			console.log(numMaps + " nummaps");
+																		};
+																		if(numMaps==="4"){return "1"}else{return "3"}})
 																	.style('grid-row-end','5')
 																	.style('grid-column-start','1')
 																	.style('grid-column-end','2');
@@ -222,20 +228,80 @@ function render_property(map_number,csv){
 		propertyVals.sort(d3.ascending);
 		let statistics = [d3.mean(propertyVals),d3.median(propertyVals),d3.quantile(propertyVals,0.25),d3.quantile(propertyVals,0.75),d3.deviation(propertyVals),d3.min(propertyVals),d3.max(propertyVals)];
 		let range = [statistics[5],statistics[2],statistics[1],statistics[3],(statistics[3]-statistics[2])*1.5+statistics[1],(statistics[3]-statistics[2])*3+statistics[1],(statistics[3]-statistics[2])*4.5+statistics[1],(statistics[3]-statistics[2])*6+statistics[1]];
-		console.log(range);
 		range = [...new Set(range)];
-		range = range.filter((d) => {if(!isNaN(d)){return d;}});
+		range = range.filter((d) => {if(!isNaN(d) && d!== 0){return d;}});
+		console.log(range);
 		let colour = d3.scaleThreshold()
-										.domain(range)
-										.range(colours);
+						.domain(range)
+						.range(colours);
 		propertyValuesAndID.forEach(function(d){
 			d3.select('g[map_number=\"'+map_number+'\"] > path[id=\"'+d[0]+'\"]')
 				.attr('fill',function(){if(d[1]) return colour(d[1]);else{return unidentifiedColour;}})
 				.attr('fill-opacity',1);
 		});
-
+		addLegend(map_number, range);
 	}
 	addTooltips(map_number,selectedProperty,propertyValuesAndID);
+}
+
+function addLegend(map_number,range){
+	//clearing prev legends
+	d3.select('.legend-area[map_number=\"' + map_number + '\"]')
+			.html('');
+
+
+	let colour = d3.scaleThreshold()
+		.domain(range)
+		.range(colours);
+
+	//container for legends
+	let legend_cont = d3.select('.legend-area[map_number=\"' + map_number + '\"]')
+		.append('div')
+		.attr('class', 'container pt-5 mr-5 mt-5');
+
+	//Adding data unavailable
+	 let legend_row = legend_cont.append('div')
+						.attr('class','row mt-1')
+						.style('max-height','20px')
+						.style('overflow-y','hidden');
+	
+	legend_row.append('div')
+		.attr('class', 'col-1 offset-1 p-2')
+		.style('background', unidentifiedColour)
+		.style('z-index', '5');
+
+	legend_row.append('div')
+		.attr('class', 'px-2 pt-0 mt-0 align-selft-start')
+		.style('z-index', '5')
+		.html(`<p>Data Unavailable</p>`);
+			
+
+	for(let i = 0 ; i < range.length ; i++){
+		let legend_row = legend_cont.append('div')
+			.attr('class', 'row mt-1')
+			.style('max-height', '20px')
+			.style('overflow-y', 'hidden');
+
+		legend_row.append('div')
+			.attr('class', 'col-1 offset-1 p-2')
+			.style('background', colours[i])
+			.style('z-index', '5');
+
+		legend_row.append('div')
+			.attr('class', 'px-2 pt-0 mt-0 align-self-start')
+			.style('z-index', '5')
+			.html(()=>{
+				if(i === 0){
+					return `0 - ${range[0]}`
+				}else if(i<range.length-1){
+					return `${range[i]} - ${range[i+1]}`;
+				}else{
+					return `${range[i]} and above`;
+				}
+			});
+	}
+		
+
 }
 
 function addTooltips(map_number,selectedProperty,propertyValuesAndID){
