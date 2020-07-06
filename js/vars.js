@@ -14,7 +14,7 @@ const map = {
     tiswadi: "./Maps/Tiswadi.json",
     darbandora: "./Maps/Darbandora.json",
     mormugao: "./Maps/Mormugao.json",
-    vp_final: "./Maps/VP_Goa_map_simp.json"
+    vp_final: "./Maps/VP_Goa_map.json"
 };
 const data = {
     c_unit_map_2011: "./data/Database.csv",
@@ -72,4 +72,3 @@ const special_vars = {
     'Urb_Under_MC/VP': [[{ "MCI": "#fe9929", "VP": "#6CC160" }], 'Categorical']
 }
 const unidentifiedColour = "#ededed";
-
