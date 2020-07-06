@@ -98,6 +98,9 @@ function render_map(map_number,json,csv){
 	//removing previously made elements
 	d3.selectAll('.svg-element[map_number=\"'+map_number+'\"]').remove();
 	d3.selectAll('.group-of-shapes[map_number=\"'+map_number+'\"]').remove();
+	//clearing prev legends
+	d3.select('.legend-area[map_number=\"' + map_number + '\"]')
+		.html('');
 
 	let type_of_map_selected = d3.select('#map-selector-'+map_number).node().value;
 	type_of_map_selected = type_of_map_selected.charAt(0).toUpperCase() + type_of_map_selected.slice(1);
@@ -120,6 +123,7 @@ function render_map(map_number,json,csv){
 									.attr('map_number',map_number)
 									.attr('height',height)
 									.attr('width',width);
+
 
 	let g = svg.append('g')
 								.attr('class','group-of-shapes')
@@ -218,6 +222,7 @@ function render_property(map_number,csv){
 					.attr('fill-opacity',1);
 			});
 		}
+		addLegend(map_number, special_vars[selectedProperty][0], true);
 	}
 	else{
 		//THIS PART IS FOR GENERAL VARIABLES WHICH WILL BE REPRESENTED THROUGHT STANDARD CHOROPLETH MAP OR NORMAL CATEGORICAL
@@ -229,25 +234,30 @@ function render_property(map_number,csv){
 		let statistics = [d3.mean(propertyVals),d3.median(propertyVals),d3.quantile(propertyVals,0.25),d3.quantile(propertyVals,0.75),d3.deviation(propertyVals),d3.min(propertyVals),d3.max(propertyVals)];
 		let range = [statistics[5],statistics[2],statistics[1],statistics[3],(statistics[3]-statistics[2])*1.5+statistics[1],(statistics[3]-statistics[2])*3+statistics[1],(statistics[3]-statistics[2])*4.5+statistics[1],(statistics[3]-statistics[2])*6+statistics[1]];
 		range = [...new Set(range)];
+		while(range.length > colours.length){
+			range.pop();
+		}
 		range = range.filter((d) => {if(!isNaN(d) && d!== 0){return d}});
 		if(range[range.length-1]>100){
 			range = range.map((d) => { return Math.ceil(d / 10) * 10; })
+		}else{
+			range = range.map((d) => { return Math.ceil( d * 100 )/100; })
 		}
-		console.log(range);
+		console.log(range,colours);
 		let colour = d3.scaleThreshold()
 						.domain(range)
 						.range(colours);
 		propertyValuesAndID.forEach(function(d){
 			d3.select('g[map_number=\"'+map_number+'\"] > path[id=\"'+d[0]+'\"]')
-				.attr('fill',function(){if(d[1]) return colour(d[1]);else{return unidentifiedColour;}})
+				.attr('fill',function(){if(d[1]) { return colour(parseFloat(d[1].replace(',','')) );}else{return unidentifiedColour;}})
 				.attr('fill-opacity',1);
 		});
-		addLegend(map_number, range);
+		addLegend(map_number, range, false);
 	}
 	addTooltips(map_number,selectedProperty,propertyValuesAndID);
 }
 
-function addLegend(map_number,range){
+function addLegend(map_number,range,special_var){
 	//clearing prev legends
 	d3.select('.legend-area[map_number=\"' + map_number + '\"]')
 			.html('');
@@ -278,33 +288,53 @@ function addLegend(map_number,range){
 		.style('z-index', '5')
 		.html(`<p>Data Unavailable</p>`);
 			
+	if(special_var){
+		let classes = Object.keys(range[0]);
+		for ( let i = 0;i<classes.length;i++ ) {
+			let legend_row = legend_cont.append('div')
+				.attr('class', 'row mt-1')
+				.style('max-height', () => { if (classes.length > 7) { return '15px' } else { return '20px' } })
+				.style('overflow-y', 'hidden');
 
-	for(let i = 0 ; i < range.length ; i++){
-		let legend_row = legend_cont.append('div')
-			.attr('class', 'row mt-1')
-			.style('max-height', '20px')
-			.style('overflow-y', 'hidden');
+			legend_row.append('div')
+				.attr('class', 'col-1 offset-1 p-2')
+				.style('background', range[0][classes[i]])
+				.style('z-index', '5');
 
-		legend_row.append('div')
-			.attr('class', 'col-1 offset-1 p-2')
-			.style('background', colours[i])
-			.style('z-index', '5');
-
-		legend_row.append('div')
-			.attr('class', 'px-2 pt-0 mt-0 align-self-start')
-			.style('z-index', '5')
-			.html(()=>{
-				if(i === 0){
-					return `0 - ${range[0]}`
-				}else if(i<range.length-1){
-					return `${range[i]} - ${range[i+1]}`;
-				}else{
-					return `${range[i]} and above`;
-				}
-			});
-	}
+			legend_row.append('div')
+				.attr('class', 'px-2 pt-0 mt-0 align-self-start')
+				.style('z-index', '5')
+				.style('font-size', ()=>{if(classes.length>7){return '12px'}else{return '15px'}})
+				.html(`<p>${classes[i]}</p>`);
+		}
 		
 
+	}else{
+		for (let i = 0; i < range.length; i++) {
+			let legend_row = legend_cont.append('div')
+				.attr('class', 'row mt-1')
+				.style('max-height', '20px')
+				.style('overflow-y', 'hidden');
+
+			legend_row.append('div')
+				.attr('class', 'col-1 offset-1 p-2')
+				.style('background', colours[i])
+				.style('z-index', '5');
+
+			legend_row.append('div')
+				.attr('class', 'px-2 pt-0 mt-0 align-self-start')
+				.style('z-index', '5')
+				.html(() => {
+					if (i === 0) {
+						return `0 - ${range[0]}`
+					} else if (i < range.length - 1) {
+						return `${range[i]} - ${range[i + 1]}`;
+					} else {
+						return `${range[i]} and above`;
+					}
+				});
+		}
+	}
 }
 
 function addTooltips(map_number,selectedProperty,propertyValuesAndID){
