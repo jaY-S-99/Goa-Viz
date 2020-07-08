@@ -67,8 +67,8 @@ const vp_maps = [['vp_final', 'Village Panchayat Map'],
 const discarded_properties = ['State', 'District', 'Subdistt', 'Village', 'Town/Village', 'Ward', 'EB', 'Level', 'Name', 'TRU', 'ID', 'STATE', 'DISTRICT', 'SUB-DISTT', 'TOWN_VILL', 'WARD', 'LEVEL', 'NAME', 'VP/MC'];
 const colours = ["#fee391", "#fec44f", "#fe9929", "#ec7014", "#cc4c02", "#993404", "#662506"];
 const special_vars = {
-    // [[Special Colour Scheme],[Type of display]]
-    'Class': [[{ "VI": "#fec44f", "V": "#fe9929", "IV": "#ec7014", "III": "#cc4c02", "II": "#993404", "I": "#662506", "D": "#A1D39A", "C": "#6CC160", "B": "#408737", "A": "#156609" }], 'Categorical'],
-    'Urb_Under_MC/VP': [[{ "MCI": "#fe9929", "VP": "#6CC160" }], 'Categorical']
+    // [[Special Colour Scheme],[Type of display],[Legend Names and colours]]
+    'Class': [[{ "VI": "#fec44f", "V": "#fe9929", "IV": "#ec7014", "III": "#cc4c02", "II": "#993404", "I": "#662506", "D": "#A1D39A", "C": "#6CC160", "B": "#408737", "A": "#156609" }], 'Categorical', [{ "Urban VI": "#fec44f", "Urban V": "#fe9929", "Urban IV": "#ec7014", "Urban III": "#cc4c02", "Urban II": "#993404", "Urban I": "#662506", "Rural D": "#A1D39A", "Rural C": "#6CC160", "Rural B": "#408737", "Rural A": "#156609" }]],
+    'Urb_Under_MC/VP': [[{ "MCI": "#fe9929", "VP": "#6CC160" }], 'Categorical', [{ "MCI": "#fe9929", "VP": "#6CC160" }]]
 }
 const unidentifiedColour = "#ededed";

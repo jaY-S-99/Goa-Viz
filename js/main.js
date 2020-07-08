@@ -107,7 +107,7 @@ function render_map(map_number,json,csv){
 
 	let temp_html = "";
 	csv.columns.forEach(function(d){
-		if(!discarded_properties.includes(d)){temp_html = temp_html + '<option value = \"'+d+'\">'+d+'</option>';}
+		if (!discarded_properties.includes(d)) { temp_html = temp_html + '<option value = \"' + d + '\">' + capitalizeFirstLetterAndRemoveExtras(d)+'</option>';}
 	});
 	d3.select('#property-selector-'+map_number).html(temp_html);
 	d3.select('#property-selector-'+map_number)
@@ -217,12 +217,12 @@ function render_property(map_number,csv){
 			propertyVals = propertyVals.map((d) => {if(!isNaN(d)){return d;}});
 			let spec_colours = special_vars[selectedProperty][0][0];
 			propertyValuesAndID.forEach(function(d){
-				d3.select('g[map_number=\"'+map_number+'\"] > path[id=\"'+d[0]+'\"]')
+					d3.select('g[map_number=\"'+map_number+'\"] > path[id=\"'+d[0]+'\"]')
 					.attr('fill',spec_colours[d[1]] ? spec_colours[d[1]] : unidentifiedColour)
 					.attr('fill-opacity',1);
 			});
 		}
-		addLegend(map_number, special_vars[selectedProperty][0], true);
+		addLegend(map_number, special_vars[selectedProperty][2], true);
 	}
 	else{
 		//THIS PART IS FOR GENERAL VARIABLES WHICH WILL BE REPRESENTED THROUGHT STANDARD CHOROPLETH MAP OR NORMAL CATEGORICAL
@@ -234,7 +234,7 @@ function render_property(map_number,csv){
 		let statistics = [d3.mean(propertyVals),d3.median(propertyVals),d3.quantile(propertyVals,0.25),d3.quantile(propertyVals,0.75),d3.deviation(propertyVals),d3.min(propertyVals),d3.max(propertyVals)];
 		let range = [statistics[5],statistics[2],statistics[1],statistics[3],(statistics[3]-statistics[2])*1.5+statistics[1],(statistics[3]-statistics[2])*3+statistics[1],(statistics[3]-statistics[2])*4.5+statistics[1],(statistics[3]-statistics[2])*6+statistics[1]];
 		range = [...new Set(range)];
-		while(range.length > colours.length + 1){
+		while(range.length >= colours.length + 1){
 			range.pop();
 		}
 		range = range.filter((d) => {if(!isNaN(d) && d!== 0){return d}});
@@ -367,6 +367,11 @@ function addTooltips(map_number,selectedProperty,propertyValuesAndID){
 
 function clearMaps(){
 	$('.outermost-container').html('');
+}
+
+function capitalizeFirstLetterAndRemoveExtras(string) {
+	string = string.replace('_',' ');
+	return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
 $('#settingsButton').click(()=>{
