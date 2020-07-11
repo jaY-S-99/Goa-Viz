@@ -234,41 +234,64 @@ function render_property(map_number,csv){
 		let statistics = [d3.mean(propertyVals),d3.median(propertyVals),d3.quantile(propertyVals,0.25),d3.quantile(propertyVals,0.75),d3.deviation(propertyVals),d3.min(propertyVals),d3.max(propertyVals)];
 		let range = [statistics[5],statistics[2],statistics[1],statistics[3],(statistics[3]-statistics[2])*1.5+statistics[1],(statistics[3]-statistics[2])*3+statistics[1],(statistics[3]-statistics[2])*4.5+statistics[1],(statistics[3]-statistics[2])*6+statistics[1]];
 		range = [...new Set(range)];
-		while(range[range.length-1] > d3.max(propertyVals)){
+
+		let distinctFlag = false;
+		let zeroRemoveFlag = false;
+		if([...new Set(propertyVals)].length<=5){
+			distinctFlag = true;
+			console.log('YES');
+			let vals = [...new Set(propertyVals)]
+			len = vals.length;
+			range = [];
+			zeroRemoveFlag = true;
+			for(let i=0 ; i<len ; i++){
+				range[i] = vals[i];
+			}
+		}
+		while (range[range.length - 1] > d3.max(propertyVals)) {
 			range.pop();
 		}
-		while(range.length >= colours.length + 1){
+		while (range.length >= colours.length + 1) {
 			range.pop();
 		}
-		console.log(range, colours);
-		if(!(range.length === 1 && range[0]===0)){
+		if (!(range.length === 1 && range[0] === 0)) {
 			range = range.filter((d) => !isNaN(parseInt(d)) && parseInt(d) !== 0);
 		}
-		else{
+		else {
 			range[0] = d3.max(propertyVals) / 3;
 			range[1] = 2 * d3.max(propertyVals) / 3;
 		}
-		console.log(range, colours);
-		if(range[range.length-1]>100){
+		if (range[range.length - 1] > 100) {
 			range = range.map((d) => { return Math.ceil(d / 10) * 10; })
-		}else{
-			range = range.map((d) => { return Math.ceil( d * 100 )/100; })
+		} else {
+			range = range.map((d) => { return Math.ceil(d * 100) / 100; })
 		}
-		console.log(range,colours);
-		let colour = d3.scaleThreshold()
-						.domain(range)
-						.range(colours);
+		if(zeroRemoveFlag){
+			range.unshift(0);
+		}
+		
+		let colour = [];
+		if(!distinctFlag){
+			colour = d3.scaleThreshold()
+				.domain(range)
+				.range(colours);
+		}else{
+			colour = d3.scaleOrdinal()
+				.domain(range)
+				.range(colours);
+		}
+
 		propertyValuesAndID.forEach(function(d){
 			d3.select('g[map_number=\"'+map_number+'\"] > path[id=\"'+d[0]+'\"]')
 				.attr('fill',function(){if(d[1]) { return colour(parseFloat(d[1].replace(',','')) );}else{return unidentifiedColour;}})
 				.attr('fill-opacity',1);
 		});
-		addLegend(map_number, range, false);
+		addLegend(map_number, range, false,distinctFlag);
 	}
 	addTooltips(map_number,selectedProperty,propertyValuesAndID);
 }
 
-function addLegend(map_number,range,special_var){
+function addLegend(map_number,range,special_var,distinctFlag){
 	//clearing prev legends
 	d3.select('.legend-area[map_number=\"' + map_number + '\"]')
 			.html('');
@@ -321,29 +344,50 @@ function addLegend(map_number,range,special_var){
 		
 
 	}else{
-		for (let i = 0; i < range.length; i++) {
-			let legend_row = legend_cont.append('div')
-				.attr('class', 'row mt-1')
-				.style('max-height', '20px')
-				.style('overflow-y', 'hidden');
+		if(distinctFlag){
+			for (let i = 0; i < range.length; i++) {
+				let legend_row = legend_cont.append('div')
+					.attr('class', 'row mt-1')
+					.style('max-height', '20px')
+					.style('overflow-y', 'hidden');
 
-			legend_row.append('div')
-				.attr('class', 'col-1 offset-1 p-2')
-				.style('background', colours[i])
-				.style('z-index', '5');
+				legend_row.append('div')
+					.attr('class', 'col-1 offset-1 p-2')
+					.style('background', colours[i])
+					.style('z-index', '5');
 
-			legend_row.append('div')
-				.attr('class', 'px-2 pt-0 mt-0 align-self-start')
-				.style('z-index', '5')
-				.html(() => {
-					if (i === 0) {
-						return `0 - ${range[0]}`
-					} else if (i < range.length - 1) {
-						return `${range[i]} - ${range[i + 1]}`;
-					} else {
-						return `${range[i]} and above`;
-					}
-				});
+				legend_row.append('div')
+					.attr('class', 'px-2 pt-0 mt-0 align-self-start')
+					.style('z-index', '5')
+					.html(range[i]);
+			}
+			
+		}else{
+			for (let i = 0; i < range.length; i++) {
+				let legend_row = legend_cont.append('div')
+					.attr('class', 'row mt-1')
+					.style('max-height', '20px')
+					.style('overflow-y', 'hidden');
+
+				legend_row.append('div')
+					.attr('class', 'col-1 offset-1 p-2')
+					.style('background', colours[i])
+					.style('z-index', '5');
+
+				legend_row.append('div')
+					.attr('class', 'px-2 pt-0 mt-0 align-self-start')
+					.style('z-index', '5')
+					.html(() => {
+						if (i === 0) {
+							return `0 - ${range[0]}`
+						} else if (i < range.length - 1) {
+							return `${range[i]} - ${range[i + 1]}`;
+						} else {
+							return `${range[i]} and above`;
+						}
+					});
+			}
+
 		}
 	}
 }
