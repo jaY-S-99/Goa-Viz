@@ -240,7 +240,15 @@ function render_property(map_number,csv){
 		while(range.length >= colours.length + 1){
 			range.pop();
 		}
-		range = range.filter((d) => {if(!isNaN(d) && d!== 0){return d}});
+		console.log(range, colours);
+		if(!(range.length === 1 && range[0]===0)){
+			range = range.filter((d) => !isNaN(parseInt(d)) && parseInt(d) !== 0);
+		}
+		else{
+			range[0] = d3.max(propertyVals) / 3;
+			range[1] = 2 * d3.max(propertyVals) / 3;
+		}
+		console.log(range, colours);
 		if(range[range.length-1]>100){
 			range = range.map((d) => { return Math.ceil(d / 10) * 10; })
 		}else{
